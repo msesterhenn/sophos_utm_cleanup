@@ -114,10 +114,18 @@ public class Main {
 					}
 
 					System.out
-							.println("Detected " + itemcount + " unused " + itemGroup + " items to delete. Continue?");
-					reader.readLine();
-					System.out.println("Are you really sure?");
-					reader.readLine();
+							.println("Detected " + itemcount + " unused " + itemGroup + " items to delete. Continue? [n]");
+					String input = reader.readLine();
+					if (!input.equalsIgnoreCase("y"))
+					{
+						continue;
+					}
+					System.out.println("Are you really sure? [n]");
+					String input2 = reader.readLine();
+					if (!input2.equalsIgnoreCase("y"))
+					{
+						continue;
+					}
 
 					for (JsonElement entry : parsedItemList.getAsJsonArray()) 
 					{
