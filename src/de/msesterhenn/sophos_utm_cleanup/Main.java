@@ -43,13 +43,14 @@ public class Main {
 
 		ArrayList<String> itemGroupsToCheck = new ArrayList<String>();
 
-		itemGroupsToCheck.add("availability_group");
-		itemGroupsToCheck.add("dns_group");
-		itemGroupsToCheck.add("dns_host");
-		itemGroupsToCheck.add("group");
-		itemGroupsToCheck.add("host");
-		itemGroupsToCheck.add("network");
-		itemGroupsToCheck.add("range");
+		itemGroupsToCheck.add("network/availability_group");
+		itemGroupsToCheck.add("network/dns_group");
+		itemGroupsToCheck.add("network/dns_host");
+		itemGroupsToCheck.add("network/group");
+		itemGroupsToCheck.add("network/host");
+		itemGroupsToCheck.add("network/network");
+		itemGroupsToCheck.add("network/range");
+		itemGroupsToCheck.add("aaa/user");
 
 		try {
 			httpClient = HttpClients.custom()
@@ -93,11 +94,11 @@ public class Main {
 
 					int itemcount = 0;
 
-					String itemList = sendGet(apibase + "/objects/network/" + itemGroup + "/", headers);
+					String itemList = sendGet(apibase + "/objects/" + itemGroup + "/", headers);
 					JsonElement parsedItemList = jsonparser.parse(itemList);
 
 					for (JsonElement entry : parsedItemList.getAsJsonArray()) {
-						String itemUsedBy = sendGet(apibase + "/objects/network/" + itemGroup + "/"
+						String itemUsedBy = sendGet(apibase + "/objects/" + itemGroup + "/"
 								+ entry.getAsJsonObject().get("_ref").getAsString() + "/usedby", headers);
 						JsonElement parsedItemUsedBy = jsonparser.parse(itemUsedBy);
 
@@ -133,7 +134,7 @@ public class Main {
 							
 							String itemValue = "";
 							
-							if (itemGroup.equals("availability_group")) 
+							if (itemGroup.equals("network/availability_group")) 
 							{
 								StringBuilder sb = new StringBuilder();
 								for (JsonElement e : entry.getAsJsonObject().get("members").getAsJsonArray())
@@ -145,15 +146,15 @@ public class Main {
 								itemValue = sb.toString();
 								
 							}
-							else if (itemGroup.equals("dns_group"))
+							else if (itemGroup.equals("network/dns_group"))
 							{
 								itemValue = entry.getAsJsonObject().get("hostname").getAsString();
 							}
-							else if (itemGroup.equals("dns_host"))
+							else if (itemGroup.equals("network/dns_host"))
 							{
 								itemValue = entry.getAsJsonObject().get("hostname").getAsString();
 							}
-							else if (itemGroup.equals("group"))
+							else if (itemGroup.equals("network/group"))
 							{
 								StringBuilder sb = new StringBuilder();
 								for (JsonElement e : entry.getAsJsonObject().get("members").getAsJsonArray())
@@ -164,11 +165,11 @@ public class Main {
 								
 								itemValue = sb.toString();
 							}
-							else if (itemGroup.equals("host"))
+							else if (itemGroup.equals("network/host"))
 							{
 								itemValue = entry.getAsJsonObject().get("address").getAsString();
 							}
-							else if (itemGroup.equals("network"))
+							else if (itemGroup.equals("network/network"))
 							{
 								StringBuilder sb = new StringBuilder();
 								sb.append(entry.getAsJsonObject().get("address").getAsString());
@@ -176,12 +177,21 @@ public class Main {
 								
 								itemValue = sb.toString();
 							}
-							else if (itemGroup.equals("range"))
+							else if (itemGroup.equals("network/range"))
 							{
 								StringBuilder sb = new StringBuilder();
 								sb.append(entry.getAsJsonObject().get("from").getAsString());
 								sb.append("-");
 								sb.append(entry.getAsJsonObject().get("to").getAsString());
+								
+								itemValue = sb.toString();
+							}
+							else if (itemGroup.equals("aaa/user"))
+							{
+								StringBuilder sb = new StringBuilder();
+								sb.append(entry.getAsJsonObject().get("name").getAsString());
+								sb.append("-");
+								sb.append(entry.getAsJsonObject().get("email_primary").getAsString());
 								
 								itemValue = sb.toString();
 							}
@@ -198,7 +208,7 @@ public class Main {
 					headersDelete.put("X-Restd-Err-Ack", "all");
 
 					for (String s : ItemsToDelete.get(itemGroup)) {
-						sendDelete(apibase + "/objects/network/" + itemGroup + "/" + s, headersDelete);
+						sendDelete(apibase + "/objects/" + itemGroup + "/" + s, headersDelete);
 					}
 
 				} catch (Exception e) {
